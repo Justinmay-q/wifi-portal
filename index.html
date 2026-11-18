@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Linden Café Wi-Fi</title>
+<style>
+  /* System fonts only: guests aren't online yet, so no web fonts or CDNs. */
+  :root {
+    --accent: #0F6E66;
+    --accent-dark: #0A4F49;
+    --ground: #F6F7F4;
+    --ink: #14181F;
+    --muted: #4A525D;
+    --line: #C9CEC6;
+    --error: #B42318;
+    --font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: var(--font); background: var(--ground); color: var(--ink); }
+  a { color: var(--accent); }
+  a:hover { color: var(--accent-dark); }
+  [hidden] { display: none !important; }
+
+  .page { min-height: 100vh; display: flex; flex-wrap: wrap; }
+  .brand { flex: 1 1 420px; background: var(--accent); color: #fff; padding: 40px 24px 64px; display: flex; flex-direction: column; gap: 20px; }
+  .logo { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 17px; }
+  .logo-mark { width: 36px; height: 36px; border-radius: 10px; background: rgba(255,255,255,.16); display: grid; place-items: center; }
+  .brand h1 { margin: 0; font-size: 30px; line-height: 1.15; }
+  .brand p { margin: 0; font-size: 15px; line-height: 1.5; color: #E3F1EF; }
+  .brand .meta { font-size: 13px; color: #CFE6E2; display: none; }
+
+  .main { flex: 999 1 560px; min-width: 0; display: flex; justify-content: center; align-items: flex-start; padding: 0 16px 24px; }
+  .card { width: 100%; max-width: 440px; margin-top: -40px; background: #fff; border-radius: 20px; box-shadow: 0 8px 28px rgba(20,24,31,.10); padding: 20px; display: flex; flex-direction: column; gap: 18px; }
+
+  .tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; background: #EEF0EC; border-radius: 12px; padding: 4px; }
+  .tab { height: 44px; border: 0; border-radius: 9px; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; background: transparent; color: var(--muted); }
+  .tab[aria-selected="true"] { background: #fff; color: var(--ink); box-shadow: 0 1px 3px rgba(20,24,31,.12); }
+
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label { font-size: 13px; font-weight: 600; color: #3A414C; }
+  .field input { height: 48px; border: 1px solid var(--line); border-radius: 12px; padding: 0 14px; font: inherit; font-size: 16px; color: var(--ink); background: #fff; }
+  .field input:focus, .check input:focus-visible, .tab:focus-visible, .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  #code { font-family: ui-monospace, Menlo, Consolas, monospace; letter-spacing: 1.5px; text-transform: uppercase; }
+  .hint { font-size: 13px; color: #5A626D; }
+  .pill { display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: #F2F7F6; border-radius: 12px; font-size: 14px; color: #2B3138; }
+
+  .check { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; line-height: 1.45; color: #3A414C; cursor: pointer; }
+  .check input { width: 20px; height: 20px; margin: 1px 0 0; accent-color: var(--accent); flex-shrink: 0; }
+
+  .error { margin: 0; padding: 12px 14px; border-radius: 12px; background: #FEF3F2; color: var(--error); font-size: 14px; line-height: 1.45; }
+
+  .btn { display: flex; align-items: center; justify-content: center; gap: 8px; height: 52px; border-radius: 14px; border: 0; background: var(--accent); color: #fff; font: inherit; font-weight: 600; font-size: 16px; cursor: pointer; text-decoration: none; width: 100%; }
+  .btn:hover { background: var(--accent-dark); color: #fff; }
+  .btn:disabled { opacity: .7; cursor: progress; }
+  .btn.secondary { background: #fff; color: var(--ink); border: 1px solid var(--line); height: 48px; font-size: 15px; }
+  .btn.secondary:hover { background: #F6F7F4; }
+
+  .footer { font-size: 13px; color: #5A626D; text-align: center; }
+
+  /* Connected screen */
+  .done { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .done-ring { width: 96px; height: 96px; border-radius: 50%; background: #DDEFEC; display: grid; place-items: center; }
+  .done-dot { width: 64px; height: 64px; border-radius: 50%; background: var(--accent); display: grid; place-items: center; }
+  .done h2 { margin: 0; font-size: 28px; }
+  .done p { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.5; }
+  .timer { display: flex; justify-content: space-between; align-items: baseline; }
+  .timer strong { font-size: 28px; font-variant-numeric: tabular-nums; }
+  .bar { height: 8px; border-radius: 4px; background: #E6E9E3; overflow: hidden; }
+  .bar > div { height: 100%; background: var(--accent); border-radius: 4px; transition: width 1s linear; }
+  .facts { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .fact { padding: 12px; background: var(--ground); border-radius: 12px; display: flex; flex-direction: column; gap: 2px; text-align: left; }
+  .fact span { font-size: 12px; color: #5A626D; }
+  .fact b { font-size: 15px; }
+
+  .demo { font-size: 12px; color: #5A626D; text-align: center; }
+
+  /* Desktop: brand panel on the left, card centred on the right */
+  @media (min-width: 900px) {
+    .brand { padding: 56px 64px; gap: 40px; min-height: 100vh; }
+    .brand h1 { font-size: 52px; line-height: 1.05; margin-top: auto; }
+    .brand p { font-size: 17px; max-width: 460px; }
+    .brand .meta { display: block; margin-top: auto; }
+    .main { align-items: center; padding: 56px 32px; }
+    .card { margin-top: 0; box-shadow: none; background: transparent; padding: 0; gap: 22px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="brand">
+    <div class="logo">
+      <div class="logo-mark" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><path d="M12 20h.01"/></svg>
+      </div>
+      Linden Café
+    </div>
+    <h1>Get online in a few seconds</h1>
+    <p>You're joining <strong>Linden_Guest</strong>. Choose how you'd like to connect.</p>
+    <span class="meta">[YOUR ADDRESS] · Open [HOURS]</span>
+  </header>
+
+  <main class="main">
+    <!-- ============ SIGN IN ============ -->
+    <form id="signin" class="card" novalidate>
+      <div class="tabs" role="tablist" aria-label="Connection method">
+        <button type="button" class="tab" role="tab" id="tab-free" aria-controls="panel-free" aria-selected="true">Free access</button>
+        <button type="button" class="tab" role="tab" id="tab-voucher" aria-controls="panel-voucher" aria-selected="false" tabindex="-1">Voucher code</button>
+      </div>
+
+      <div id="panel-free" role="tabpanel" aria-labelledby="tab-free" style="display:flex;flex-direction:column;gap:16px">
+        <div class="field">
+          <label for="email">Email address</label>
+          <input id="email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" maxlength="254">
+        </div>
+        <div class="pill">
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0F6E66" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          1 hour free per visit
+        </div>
+      </div>
+
+      <div id="panel-voucher" role="tabpanel" aria-labelledby="tab-voucher" hidden>
+        <div class="field">
+          <label for="code">Voucher code</label>
+          <input id="code" name="code" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="e.g. LND-4F7K-92QA" maxlength="32">
+          <span class="hint">Printed on your receipt. Ask the counter if you need one.</span>
+        </div>
+      </div>
+
+      <label class="check">
+        <input id="agree" type="checkbox">
+        <span>I agree to the <a href="#terms">Terms of Use</a> and <a href="#privacy">Privacy Notice</a>.</span>
+      </label>
+
+      <p id="error" class="error" role="alert" hidden></p>
+
+      <button id="connect" class="btn" type="submit">
+        <span id="connect-label">Connect</span>
+        <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </button>
+
+      <p class="footer">Trouble connecting? Ask our staff, or turn Wi-Fi off and on again.</p>
+      <p id="demo-note" class="demo" hidden>Demo mode: no router detected, so this only records the session in Supabase.</p>
+    </form>
+
+    <!-- ============ CONNECTED ============ -->
+    <section id="connected" class="card" hidden aria-live="polite">
+      <div class="done">
+        <div class="done-ring"><div class="done-dot">
+          <svg aria-hidden="true" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+        </div></div>
+        <h2>You're connected</h2>
+        <p>Enjoy browsing on Linden_Guest. You can close this page.</p>
+      </div>
+      <div class="timer"><span class="hint">Time remaining</span><strong id="remaining">--:--</strong></div>
+      <div class="bar" aria-hidden="true"><div id="bar" style="width:100%"></div></div>
+      <div class="facts">
+        <div class="fact"><span>Network</span><b>Linden_Guest</b></div>
+        <div class="fact"><span>Plan</span><b id="plan">—</b></div>
+      </div>
+      <button id="more-time" class="btn secondary" type="button">Add more time with a voucher</button>
+    </section>
+  </main>
+</div>
+
+<script>
+/* ======================== CONFIG ======================== */
+// Your Edge Function URL: https://<project-ref>.supabase.co/functions/v1/portal-auth
+// const FUNCTION_URL = "https://YOUR-PROJECT-REF.supabase.co/functions/v1/portal-auth";
+const FUNCTION_URL = "https://YOUR-PROJECT-REF.supabase.co/functions/v1/portal-auth";
+/* ======================================================== */
+
+const $ = (id) => document.getElementById(id);
+const params = new URLSearchParams(location.search);
+const fas = params.get("fas");              // set by openNDS; missing = demo mode
+let mode = "free";
+let timer = null;
+
+const MESSAGES = {
+  invalid_email: "Please enter a valid email address.",
+  free_used: "You've already used your free hour today. Use a voucher code for more time.",
+  invalid_code: "That voucher code wasn't recognised. Check it and try again.",
+  voucher_expired: "That voucher has expired. Please ask the counter for a new one.",
+  voucher_used_up: "That voucher has already been used.",
+  too_many_attempts: "Too many wrong codes. Please wait 10 minutes or ask our staff.",
+  server_error: "Something went wrong on our side. Please try again in a moment.",
+  network: "Couldn't reach the sign-in server. Check you're on Linden_Guest and try again.",
+};
+
+// ---------- Tabs ----------
+function setMode(next) {
+  mode = next;
+  const free = next === "free";
+  $("tab-free").setAttribute("aria-selected", free);
+  $("tab-voucher").setAttribute("aria-selected", !free);
+  $("tab-free").tabIndex = free ? 0 : -1;
+  $("tab-voucher").tabIndex = free ? -1 : 0;
+  $("panel-free").hidden = !free;
+  $("panel-voucher").hidden = free;
+  $("panel-free").style.display = free ? "flex" : "";
+  showError(null);
+}
+$("tab-free").addEventListener("click", () => setMode("free"));
+$("tab-voucher").addEventListener("click", () => setMode("voucher"));
+document.querySelector(".tabs").addEventListener("keydown", (e) => {
+  if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+    const next = mode === "free" ? "voucher" : "free";
+    setMode(next);
+    $("tab-" + next).focus();
+  }
+});
+
+function showError(msg) {
+  $("error").textContent = msg || "";
+  $("error").hidden = !msg;
+}
+
+function setBusy(busy) {
+  $("connect").disabled = busy;
+  $("connect-label").textContent = busy ? "Connecting…" : "Connect";
+}
+
+// ---------- Submit ----------
+$("signin").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  showError(null);
+
+  const email = $("email").value.trim();
+  const code = $("code").value.replace(/\s/g, "").toUpperCase();
+
+  if (mode === "free" && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+    showError(MESSAGES.invalid_email); $("email").focus(); return;
+  }
+  if (mode === "voucher" && code.length < 4) {
+    showError("Please enter your voucher code."); $("code").focus(); return;
+  }
+  if (!$("agree").checked) {
+    showError("Please agree to the Terms of Use to continue."); $("agree").focus(); return;
+  }
+
+  setBusy(true);
+  let res;
+  try {
+    const r = await fetch(FUNCTION_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ method: mode, email, code, fas }),
+    });
+    res = await r.json();
+  } catch {
+    setBusy(false); showError(MESSAGES.network); return;
+  }
+
+  if (!res.ok) {
+    setBusy(false);
+    showError(MESSAGES[res.reason] || MESSAGES.server_error);
+    return;
+  }
+
+  const planLabel = res.plan === "voucher" ? `Voucher · ${fmtMinutes(res.minutes)}` : `Free · ${fmtMinutes(res.minutes)}`;
+
+  if (res.auth_url_base) {
+    // Real router: send the device to openNDS to unlock it.
+    // openNDS then redirects back here with ?connected=1 to show the timer.
+    const back = new URL(location.pathname, location.href);
+    back.searchParams.set("connected", "1");
+    back.searchParams.set("until", res.expires_at);
+    back.searchParams.set("total", res.minutes);
+    back.searchParams.set("plan", planLabel);
+    location.href = `${res.auth_url_base}&redir=${encodeURIComponent(back.href)}&custom=`;
+    return;
+  }
+
+  // Demo mode: just show the connected screen.
+  showConnected(res.expires_at, res.minutes, planLabel);
+});
+
+// ---------- Connected screen ----------
+function fmtMinutes(m) {
+  m = Number(m);
+  if (m % 1440 === 0) return `${m / 1440} day${m === 1440 ? "" : "s"}`;
+  if (m % 60 === 0) return `${m / 60} hour${m === 60 ? "" : "s"}`;
+  return `${m} min`;
+}
+
+function showConnected(untilIso, totalMinutes, planLabel) {
+  $("signin").hidden = true;
+  $("connected").hidden = false;
+  $("plan").textContent = planLabel || "—";
+  const until = new Date(untilIso).getTime();
+  const total = Number(totalMinutes) * 60000 || 3600000;
+
+  clearInterval(timer);
+  const tick = () => {
+    const left = Math.max(0, until - Date.now());
+    const s = Math.floor(left / 1000);
+    const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
+    $("remaining").textContent = (h ? h + ":" + String(m).padStart(2, "0") : m) + ":" + String(sec).padStart(2, "0");
+    $("bar").style.width = Math.min(100, (left / total) * 100) + "%";
+    if (left === 0) clearInterval(timer);
+  };
+  tick();
+  timer = setInterval(tick, 1000);
+}
+
+$("more-time").addEventListener("click", () => {
+  clearInterval(timer);
+  $("connected").hidden = true;
+  $("signin").hidden = false;
+  setBusy(false);
+  setMode("voucher");
+  $("code").focus();
+});
+
+// ---------- Start ----------
+if (params.get("connected") === "1" && params.get("until")) {
+  showConnected(params.get("until"), params.get("total"), params.get("plan"));
+  // The router sets session length itself, so a voucher can't extend it from
+  // here. Guests reconnect with a voucher after the free hour ends instead.
+  $("more-time").hidden = true;
+} else if (!fas) {
+  $("demo-note").hidden = false;
+}
+</script>
+</body>
+</html>
