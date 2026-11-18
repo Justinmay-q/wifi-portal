@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Linden Café Wi-Fi</title>
+<title>CEC Wi-Fi ALL</title>
 <style>
   /* System fonts only: guests aren't online yet, so no web fonts or CDNs. */
   :root {
@@ -93,11 +93,11 @@
       <div class="logo-mark" aria-hidden="true">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><path d="M12 20h.01"/></svg>
       </div>
-      Linden Café
+      CEC Wi-Fi ALL
     </div>
     <h1>Get online in a few seconds</h1>
-    <p>You're joining <strong>Linden_Guest</strong>. Choose how you'd like to connect.</p>
-    <span class="meta">[YOUR ADDRESS] · Open [HOURS]</span>
+    <p>You're joining <strong>CEC_Guest</strong>. Choose how you'd like to connect.</p>
+    <span class="meta">For students, staff and guests of CEC</span>
   </header>
 
   <main class="main">
@@ -122,8 +122,8 @@
       <div id="panel-voucher" role="tabpanel" aria-labelledby="tab-voucher" hidden>
         <div class="field">
           <label for="code">Voucher code</label>
-          <input id="code" name="code" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="e.g. LND-4F7K-92QA" maxlength="32">
-          <span class="hint">Printed on your receipt. Ask the counter if you need one.</span>
+          <input id="code" name="code" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="e.g. LND-ABCD-1234" maxlength="32">
+          <span class="hint">Get a code from the IT office or your teacher.</span>
         </div>
       </div>
 
@@ -139,7 +139,7 @@
         <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
       </button>
 
-      <p class="footer">Trouble connecting? Ask our staff, or turn Wi-Fi off and on again.</p>
+      <p class="footer">Trouble connecting? Ask the IT office, or turn Wi-Fi off and on again.</p>
       <p id="demo-note" class="demo" hidden>Demo mode: no router detected, so this only records the session in Supabase.</p>
     </form>
 
@@ -150,12 +150,12 @@
           <svg aria-hidden="true" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
         </div></div>
         <h2>You're connected</h2>
-        <p>Enjoy browsing on Linden_Guest. You can close this page.</p>
+        <p>Enjoy browsing on CEC_Guest. You can close this page.</p>
       </div>
       <div class="timer"><span class="hint">Time remaining</span><strong id="remaining">--:--</strong></div>
       <div class="bar" aria-hidden="true"><div id="bar" style="width:100%"></div></div>
       <div class="facts">
-        <div class="fact"><span>Network</span><b>Linden_Guest</b></div>
+        <div class="fact"><span>Network</span><b>CEC_Guest</b></div>
         <div class="fact"><span>Plan</span><b id="plan">—</b></div>
       </div>
       <button id="more-time" class="btn secondary" type="button">Add more time with a voucher</button>
@@ -166,8 +166,8 @@
 <script>
 /* ======================== CONFIG ======================== */
 // Your Edge Function URL: https://<project-ref>.supabase.co/functions/v1/portal-auth
-// const FUNCTION_URL = "https://YOUR-PROJECT-REF.supabase.co/functions/v1/portal-auth";
-const FUNCTION_URL = "https://YOUR-PROJECT-REF.supabase.co/functions/v1/portal-auth";
+// ⬇⬇ PASTE YOUR SUPABASE FUNCTION URL BETWEEN THE QUOTES (ends in /dynamic-function) ⬇⬇
+const FUNCTION_URL = "https://trmlnyruxexobipluygg.supabase.co/functions/v1/dynamic-function";
 /* ======================================================== */
 
 const $ = (id) => document.getElementById(id);
@@ -180,11 +180,11 @@ const MESSAGES = {
   invalid_email: "Please enter a valid email address.",
   free_used: "You've already used your free hour today. Use a voucher code for more time.",
   invalid_code: "That voucher code wasn't recognised. Check it and try again.",
-  voucher_expired: "That voucher has expired. Please ask the counter for a new one.",
+  voucher_expired: "That voucher has expired. Please ask the IT office for a new one.",
   voucher_used_up: "That voucher has already been used.",
-  too_many_attempts: "Too many wrong codes. Please wait 10 minutes or ask our staff.",
+  too_many_attempts: "Too many wrong codes. Please wait 10 minutes or ask the IT office.",
   server_error: "Something went wrong on our side. Please try again in a moment.",
-  network: "Couldn't reach the sign-in server. Check you're on Linden_Guest and try again.",
+  network: "Couldn't reach the sign-in server. Check you're on CEC_Guest and try again.",
 };
 
 // ---------- Tabs ----------
